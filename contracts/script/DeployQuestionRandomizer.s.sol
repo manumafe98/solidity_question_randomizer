@@ -15,7 +15,8 @@ contract DeployQuestionRandomizer is Script {
 
         if (config.subscriptionId == 0) {
             CreateSubscription createSubscription = new CreateSubscription();
-            (config.subscriptionId, config.vrfCoordinator) = createSubscription.createSubscription(config.vrfCoordinator, config.account);
+            (config.subscriptionId, config.vrfCoordinator) =
+                createSubscription.createSubscription(config.vrfCoordinator, config.account);
 
             FundSubscription fundSubscription = new FundSubscription();
             fundSubscription.fundSubscription(config.vrfCoordinator, config.subscriptionId, config.link, config.account);
@@ -34,7 +35,9 @@ contract DeployQuestionRandomizer is Script {
         );
         vm.stopBroadcast();
 
-        addConsumer.addConsumer(address(questionRandomizer), config.vrfCoordinator, config.subscriptionId, config.account);
+        addConsumer.addConsumer(
+            address(questionRandomizer), config.vrfCoordinator, config.subscriptionId, config.account
+        );
         return (questionRandomizer, helperConfig);
     }
 }

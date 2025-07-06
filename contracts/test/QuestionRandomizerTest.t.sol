@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {DeployQuestionRandomizer} from "../script/DeployQuestionRandomizer.s.sol";
 import {HelperConfig} from "../script/HelperConfig.s.sol";
 import {QuestionRandomizer} from "../src/QuestionRandomizer.sol";
@@ -26,8 +26,14 @@ contract QuestionRandomizerTest is Test, CodeConstants {
 
     uint256 public constant QUESTION_ID = 1;
     string public constant QUESTION = "What is a smart contract?.";
-    string[] public OPTIONS = ["A physical agreement that requires notarization.", "A type of blockchain that only records user credentials.", "A smart contract is an agreement that is deployed on a decentralized blockchain. Once deployed, it cannot be altered, and its terms are public.", "A manual contract that involves intermediaries."];
-    string public constant ANSWER = "A smart contract is an agreement that is deployed on a decentralized blockchain. Once deployed, it cannot be altered, and its terms are public.";
+    string[] public OPTIONS = [
+        "A physical agreement that requires notarization.",
+        "A type of blockchain that only records user credentials.",
+        "A smart contract is an agreement that is deployed on a decentralized blockchain. Once deployed, it cannot be altered, and its terms are public.",
+        "A manual contract that involves intermediaries."
+    ];
+    string public constant ANSWER =
+        "A smart contract is an agreement that is deployed on a decentralized blockchain. Once deployed, it cannot be altered, and its terms are public.";
 
     event QuestionAdded(uint256 indexed questionId, string question, string[] options, string answer);
 
@@ -119,7 +125,7 @@ contract QuestionRandomizerTest is Test, CodeConstants {
         uint256 randomNumberBeforeFullFill = questionRandomizer.getRandomNumberByRequestId(requestId);
         VRFCoordinatorV2_5Mock(vrfCoordinator).fulfillRandomWords(requestId, address(questionRandomizer));
         uint256 randomNumberAfterFullFill = questionRandomizer.getRandomNumberByRequestId(requestId);
-        
+
         assertEq(randomNumberBeforeFullFill, 0);
         assert(randomNumberAfterFullFill != 0);
     }
