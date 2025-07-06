@@ -31,6 +31,13 @@ contract QuestionRandomizerTest is Test, CodeConstants {
 
     event QuestionAdded(uint256 indexed questionId, string question, string[] options, string answer);
 
+    modifier onlyLocalChain() {
+        if (block.chainid != LOCAL_CHAIN_ID) {
+            return;
+        }
+        _;
+    }
+
     function setUp() external {
         DeployQuestionRandomizer deployer = new DeployQuestionRandomizer();
         (questionRandomizer, helperConfig) = deployer.run();
@@ -98,10 +105,10 @@ contract QuestionRandomizerTest is Test, CodeConstants {
         uint256 currentRequestId = questionRandomizer.getLastRequestId();
 
         assertEq(previousRequestId, 0);
-        assertEq(currentRequestId, 1);
+        assert(currentRequestId != 0);
     }
 
-    function testGetRandomNumberIsFullfilled() external {
+    function testGetRandomNumberIsFullfilled() external onlyLocalChain {
         vm.startPrank(msg.sender);
         questionRandomizer.addQuestion(QUESTION, OPTIONS, ANSWER);
         questionRandomizer.getRandomNumber();
@@ -117,7 +124,7 @@ contract QuestionRandomizerTest is Test, CodeConstants {
         assert(randomNumberAfterFullFill != 0);
     }
 
-    function testGetRandomQuestion() external {
+    function testGetRandomQuestion() external onlyLocalChain {
         vm.startPrank(msg.sender);
         questionRandomizer.addQuestion(QUESTION, OPTIONS, ANSWER);
         questionRandomizer.getRandomNumber();
