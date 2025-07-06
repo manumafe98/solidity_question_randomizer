@@ -4,3 +4,6 @@
 [submodule "contracts/lib/chainlink"]
 	path = contracts/lib/chainlink
 	url = https://github.com/smartcontractkit/chainlink
+[submodule "contracts/lib/foundry-devops"]
+	path = contracts/lib/foundry-devops
+	url = https://github.com/Cyfrin/foundry-devops

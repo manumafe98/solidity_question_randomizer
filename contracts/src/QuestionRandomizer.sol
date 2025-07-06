@@ -3,6 +3,7 @@ pragma solidity ^0.8.30;
 
 import {VRFConsumerBaseV2Plus} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
 import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
+import {Types} from "./Types.sol";
 
 /**
  * @title Question Randomizer
@@ -10,26 +11,20 @@ import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/V
  * @notice This contract is designed for quiz-based applications to help people learn about smart contract development.
  * @notice It leverages Chainlink VRF to obtain verifiable random numbers, which are used to return random questions.
  */
-abstract contract QuestionRandomizer is VRFConsumerBaseV2Plus {
-    /* Type Declarations */
-    struct Question {
-        uint256 id;
-        string question;
-        string[] options;
-        string answer;
-    }
+contract QuestionRandomizer is VRFConsumerBaseV2Plus {
+    error QuestionRandomizer__ToGenerateRandomNumbersFirstAddQuestions();
 
     /* State Variables */
     uint256 private s_totalQuestions;
     uint256 private s_lastRequestId;
 
-    uint256 private s_subscriptionId;
-    bytes32 private s_keyHash;
-    uint32 private s_callbackGasLimit;
+    uint256 private immutable i_subscriptionId;
+    bytes32 private immutable i_keyHash;
+    uint32 private immutable i_callbackGasLimit;
     uint16 private s_requestConfirmations;
     uint32 private s_numWords;
 
-    mapping(uint256 => Question) private s_questions;
+    mapping(uint256 => Types.Question) private s_questions;
     mapping(uint256 => uint256) private s_randomNumbers;
 
     /* Events */
@@ -52,9 +47,9 @@ abstract contract QuestionRandomizer is VRFConsumerBaseV2Plus {
         uint16 requestConfirmations,
         uint32 numWords
     ) VRFConsumerBaseV2Plus(vrfCoordinator) {
-        s_subscriptionId = subscriptionId;
-        s_keyHash = keyHash;
-        s_callbackGasLimit = callbackGasLimit;
+        i_subscriptionId = subscriptionId;
+        i_keyHash = keyHash;
+        i_callbackGasLimit = callbackGasLimit;
         s_requestConfirmations = requestConfirmations;
         s_numWords = numWords;
     }
@@ -70,7 +65,7 @@ abstract contract QuestionRandomizer is VRFConsumerBaseV2Plus {
         uint256 totalQuestions = s_totalQuestions += 1;
 
         s_questions[totalQuestions] =
-            Question({id: totalQuestions, question: _question, options: _options, answer: _answer});
+            Types.Question({id: totalQuestions, question: _question, options: _options, answer: _answer});
 
         emit QuestionAdded(totalQuestions, _question, _options, _answer);
     }
@@ -80,12 +75,15 @@ abstract contract QuestionRandomizer is VRFConsumerBaseV2Plus {
      * @dev Only callable by the contract owner. Saves the request ID for later use.
      */
     function getRandomNumber() external onlyOwner {
+        if (s_totalQuestions == 0) {
+            revert QuestionRandomizer__ToGenerateRandomNumbersFirstAddQuestions();
+        }
         s_lastRequestId = s_vrfCoordinator.requestRandomWords(
             VRFV2PlusClient.RandomWordsRequest({
-                keyHash: s_keyHash,
-                subId: s_subscriptionId,
+                keyHash: i_keyHash,
+                subId: i_subscriptionId,
                 requestConfirmations: s_requestConfirmations,
-                callbackGasLimit: s_callbackGasLimit,
+                callbackGasLimit: i_callbackGasLimit,
                 numWords: s_numWords,
                 extraArgs: VRFV2PlusClient._argsToBytes(VRFV2PlusClient.ExtraArgsV1({nativePayment: false}))
             })
@@ -108,10 +106,10 @@ abstract contract QuestionRandomizer is VRFConsumerBaseV2Plus {
 
     /**
      * @notice Retrieves the last randomly selected question.
-     * @return question The question object selected by the most recent VRF request.
+     * @return question The question object selected by the most recent VRF requested random number.
      */
-    function getRandomQuestion() external view returns (Question memory question) {
-        question = s_questions[s_lastRequestId];
+    function getRandomQuestion() external view returns (Types.Question memory question) {
+        question = s_questions[s_randomNumbers[s_lastRequestId]];
     }
 
     /**
@@ -136,5 +134,31 @@ abstract contract QuestionRandomizer is VRFConsumerBaseV2Plus {
      */
     function getNumWords() external view returns (uint32 numWords) {
         numWords = s_numWords;
+    }
+
+    /**
+     * @notice Gets the number of request confirmations that were configured on VRF.
+     * @return requestConfirmations The number of requests confirmations to be taken until returning the random words.
+     */
+    function getRequestConfirmations() external view returns (uint16 requestConfirmations) {
+        requestConfirmations = s_requestConfirmations;
+    }
+
+    /**
+     * @notice Retrieves a specific question by its ID.
+     * @param _questionId The unique identifier of the question to retrieve.
+     * @return question The Question struct associated with the provided ID.
+     */
+    function getQuestionById(uint256 _questionId) external view returns (Types.Question memory question) {
+        question = s_questions[_questionId];
+    }
+
+    /**
+     * @notice Retrieves a specific random number by its request id.
+     * @param _requestId The unique identifier of the random number to retrieve.
+     * @return randomNumber The random number associated with the provided request id.
+     */
+    function getRandomNumberByRequestId(uint256 _requestId) external view returns (uint256 randomNumber) {
+        randomNumber = s_randomNumbers[_requestId];
     }
 }
