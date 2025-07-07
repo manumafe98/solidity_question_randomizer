@@ -1,0 +1,12 @@
+{
+    "31337": {
+      "QuestionRandomizer": {
+        "address": ""
+      }
+    },
+    "11155111": {
+      "QuestionRandomizer": {
+        "address": "0x75C11d53CCE397Fb62E0C94b030C5D9317C68280"
+      }
+    }
+}

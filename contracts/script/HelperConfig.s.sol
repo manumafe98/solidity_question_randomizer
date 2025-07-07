@@ -67,6 +67,9 @@ contract HelperConfig is Script, CodeConstants {
         VRFCoordinatorV2_5Mock vrfCoordinatorMock =
             new VRFCoordinatorV2_5Mock(MOCK_BASE_FEE, MOCK_GAS_PRICE_LINK, MOCK_WEI_PER_UINT_LINK);
         LinkToken link = new LinkToken();
+        // https://github.com/Cyfrin/foundry-full-course-cu/discussions/2246
+        // subId = uint256(keccak256(abi.encodePacked(msg.sender, blockhash(block.number) - 1 , address(this), currentSubNonce)));
+        // causes arithmetic underflow delete -1 from blockhash(block.number) - 1 leaving -> blockhash(block.number)
         uint256 subscriptionId = vrfCoordinatorMock.createSubscription();
         vm.stopBroadcast();
 
