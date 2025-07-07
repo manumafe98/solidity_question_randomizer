@@ -6,7 +6,7 @@ import {HelperConfig} from "./HelperConfig.s.sol";
 import {DevOpsTools} from "@foundry-devops/src/DevOpsTools.sol";
 import {VRFCoordinatorV2_5Mock} from "@chainlink/contracts/src/v0.8/vrf/mocks/VRFCoordinatorV2_5Mock.sol";
 import {LinkToken} from "../test/mocks/LinkToken.sol";
-import {CodeConstants} from "./HelperConfig.s.sol";
+import {CodeConstants} from "./CodeConstants.sol";
 
 contract CreateSubscription is Script {
     function createSubscriptionUsingConfig() public returns (uint256, address) {

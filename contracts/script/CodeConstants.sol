@@ -11,6 +11,8 @@ abstract contract CodeConstants {
     uint32 public constant NUM_WORDS = 1;
     uint16 public constant REQUEST_CONFIRMATIONS = 3;
 
+    uint256 public constant SEPOLIA_SUBSCRIPTION_ID = 61338942976989141060402830121361937771833367373417875570546374790410087826090;
+
     bytes32 public constant KEY_HASH = 0x787d74caea10b2b357790d5b5247c2f63d1d91572a9846f780606e4d953677ae;
 
     address public constant FOUNDRY_DEFAULT_SENDER = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;

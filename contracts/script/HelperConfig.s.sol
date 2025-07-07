@@ -47,7 +47,7 @@ contract HelperConfig is Script, CodeConstants {
 
     function getSepoliaEthConfig() public pure returns (NetworkConfig memory sepoliaNetworkConfig) {
         sepoliaNetworkConfig = NetworkConfig({
-            subscriptionId: 0,
+            subscriptionId: SEPOLIA_SUBSCRIPTION_ID,
             keyHash: KEY_HASH,
             callbackGasLimit: CALLBACK_GAS_LIMIT,
             numWords: NUM_WORDS,
